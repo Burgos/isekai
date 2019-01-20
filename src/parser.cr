@@ -823,6 +823,8 @@ module Isekai
             # Delegates the statement to the transform function based on its type
             def transform_statement (statement, working_symtab)
                 case statement.kind
+                when .decl_stmt?
+                    working_symtab = declare_variable(ClangUtils.getFirstChild(statement), working_symtab)
                 when .compound_stmt?
                     working_symtab = transform_compound(statement, working_symtab)
                 when .var_decl?
@@ -842,6 +844,7 @@ module Isekai
                     raise "Expecting assignment operator" unless (statement.spelling == "=")
                     working_symtab = transform_assignment(statement, working_symtab)
                 else
+                    ClangUtils.dumpCursorAst(statement)
                     raise "Can't resolve statement #{statement.inspect}"
                 end
                 return working_symtab
